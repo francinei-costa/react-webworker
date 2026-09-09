@@ -1,0 +1,7 @@
+# criando o projeto
+npm create vite@latest react-webworker
+
+# instalando o opção SWC
+npm uninstall @vitejs/plugin-react
+npm install -D @vitejs/plugin-react-swc
+
