@@ -5,3 +5,5 @@ npm create vite@latest react-webworker
 npm uninstall @vitejs/plugin-react
 npm install -D @vitejs/plugin-react-swc
 
+# instalando o pacote de icons
+npm i lucide-react
