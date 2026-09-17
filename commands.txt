@@ -6,4 +6,4 @@ npm uninstall @vitejs/plugin-react
 npm install -D @vitejs/plugin-react-swc
 
 # instalando o pacote de icons
-npm i lucide-react
+npm i lucide-react date-fns react-toastify
