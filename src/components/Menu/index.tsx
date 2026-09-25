@@ -1,68 +1,79 @@
 import {
-  HouseIcon,
   HistoryIcon,
+  HouseIcon,
+  MoonIcon,
   SettingsIcon,
   SunIcon,
-  MoonIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 import styles from "./styles.module.css";
+import { useState, useEffect } from "react";
+import { RouterLink } from "../RouterLink";
 
-type AvailableThemes = "light" | "dark";
+type AvailableThemes = "dark" | "light";
+
 export function Menu() {
-  //lazy initialization of theme state from localStorage
   const [theme, setTheme] = useState<AvailableThemes>(() => {
-    const storedTheme =
-      (localStorage.getItem("theme") as AvailableThemes) ?? "dark";
-    return storedTheme;
+    const storageTheme =
+      (localStorage.getItem("theme") as AvailableThemes) || "dark";
+    return storageTheme;
   });
+
   const nextThemeIcon = {
     dark: <SunIcon />,
     light: <MoonIcon />,
   };
 
-  function handleThemeToggle(
+  function handleThemeChange(
     event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
   ) {
     event.preventDefault();
-    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
+
+    setTheme((prevTheme) => {
+      const nextTheme = prevTheme === "dark" ? "light" : "dark";
+      return nextTheme;
+    });
   }
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
-    return () => {
-      document.documentElement.removeAttribute("data-theme");
-    };
   }, [theme]);
 
   return (
     <nav className={styles.menu}>
-      <a className={styles.menuLink} href="#" aria-label="Home" title="Home">
-        <HouseIcon />
-      </a>
-      <a
+      <RouterLink
         className={styles.menuLink}
-        href="#"
+        href="/"
+        aria-label="Ir para a Home"
+        title="Ir para a Home"
+      >
+        <HouseIcon />
+      </RouterLink>
+
+      <RouterLink
+        className={styles.menuLink}
+        href="/history/"
         aria-label="Ver Histórico"
         title="Ver Histórico"
       >
         <HistoryIcon />
-      </a>
-      <a
+      </RouterLink>
+
+      <RouterLink
         className={styles.menuLink}
-        href="#"
+        href="/settings/"
         aria-label="Configurações"
         title="Configurações"
       >
         <SettingsIcon />
-      </a>
+      </RouterLink>
+
       <a
         className={styles.menuLink}
         href="#"
         aria-label="Mudar Tema"
         title="Mudar Tema"
-        onClick={handleThemeToggle}
+        onClick={handleThemeChange}
       >
         {nextThemeIcon[theme]}
       </a>
