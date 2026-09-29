@@ -1,56 +1,34 @@
-import { TrashIcon } from 'lucide-react';
-import { Container } from '../../components/Container';
-import { DefaultButton } from '../../components/DefaultButton';
-import { Heading } from '../../components/Heading';
-import { MainTemplate } from '../../templates/MainTemplate';
+import { TrashIcon } from "lucide-react";
+import { Container } from "../../components/Container";
+import { DefaultButton } from "../../components/DefaultButton";
+import { Heading } from "../../components/Heading";
+import { MainTemplate } from "../../templates/MainTemplate";
 
-import styles from './styles.module.css';
+import styles from "./styles.module.css";
 
-import { useTaskContext } from '../../hooks/useTaskContext';
-import { formatDate } from '../../utils/formatDate';
-import { getTaskStatus } from '../../utils/getTaskStatus';
-import { sortTasks, type SortTasksOptions } from '../../utils/sortTasks';
-import { useEffect, useState } from 'react';
-import { showMessage } from '../../adapters/showMessage';
-import { TaskActionTypes } from '../../contexts/TaskContext/taskActions';
+import { useTaskContext } from "../../hooks/useTaskContext";
+import { formatDate } from "../../utils/formatDate";
+import { getTaskStatus } from "../../utils/getTaskStatus";
+import { sortTasks, type SortTasksOptions } from "../../utils/sortTasks";
+import { useEffect, useState } from "react";
+import { showMessage } from "../../adapters/showMessage";
+import { TaskActionTypes } from "../../contexts/TaskContext/taskActions";
 
 export function History() {
   const { state, dispatch } = useTaskContext();
-  const [confirmClearHistory, setConfirmClearHistory] = useState(false);
   const hasTasks = state.tasks.length > 0;
 
-  const [sortTasksOptions, setSortTaskOptions] = useState<SortTasksOptions>(
-    () => {
-      return {
-        tasks: sortTasks({ tasks: state.tasks }),
-        field: 'startDate',
-        direction: 'desc',
-      };
-    },
-  );
+  const [sortTasksOptions, setSortTasksOptions] = useState<
+    Pick<SortTasksOptions, "field" | "direction">
+  >({
+    field: "startDate",
+    direction: "desc",
+  });
+  const sortedTasks = sortTasks({ tasks: state.tasks, ...sortTasksOptions });
 
   useEffect(() => {
-    setSortTaskOptions(prevState => ({
-      ...prevState,
-      tasks: sortTasks({
-        tasks: state.tasks,
-        direction: prevState.direction,
-        field: prevState.field,
-      }),
-    }));
-  }, [state.tasks]);
-
-  useEffect(() => {
-    document.title = 'Histórico - Chronos Pomodoro';
+    document.title = "Histórico - Chronos Pomodoro";
   }, []);
-
-  useEffect(() => {
-    if (!confirmClearHistory) return;
-
-    setConfirmClearHistory(false);
-
-    dispatch({ type: TaskActionTypes.RESET_STATE });
-  }, [confirmClearHistory, dispatch]);
 
   useEffect(() => {
     return () => {
@@ -58,24 +36,19 @@ export function History() {
     };
   }, []);
 
-  function handleSortTasks({ field }: Pick<SortTasksOptions, 'field'>) {
-    const newDirection = sortTasksOptions.direction === 'desc' ? 'asc' : 'desc';
-
-    setSortTaskOptions({
-      tasks: sortTasks({
-        direction: newDirection,
-        tasks: sortTasksOptions.tasks,
-        field,
-      }),
-      direction: newDirection,
+  function handleSortTasks({ field }: Pick<SortTasksOptions, "field">) {
+    setSortTasksOptions((prevState) => ({
       field,
-    });
+      direction: prevState.direction === "desc" ? "asc" : "desc",
+    }));
   }
 
   function handleResetHistory() {
     showMessage.dismiss();
-    showMessage.confirm('Tem certeza?', confirmation => {
-      setConfirmClearHistory(confirmation);
+    showMessage.confirm("Tem certeza?", (confirmation) => {
+      if (confirmation) {
+        dispatch({ type: TaskActionTypes.RESET_STATE });
+      }
     });
   }
 
@@ -88,9 +61,9 @@ export function History() {
             <span className={styles.buttonContainer}>
               <DefaultButton
                 icon={<TrashIcon />}
-                color='red'
-                aria-label='Apagar todo o histórico'
-                title='Apagar histórico'
+                color="red"
+                aria-label="Apagar todo o histórico"
+                title="Apagar histórico"
                 onClick={handleResetHistory}
               />
             </span>
@@ -105,19 +78,19 @@ export function History() {
               <thead>
                 <tr>
                   <th
-                    onClick={() => handleSortTasks({ field: 'name' })}
+                    onClick={() => handleSortTasks({ field: "name" })}
                     className={styles.thSort}
                   >
                     Tarefa ↕
                   </th>
                   <th
-                    onClick={() => handleSortTasks({ field: 'duration' })}
+                    onClick={() => handleSortTasks({ field: "duration" })}
                     className={styles.thSort}
                   >
                     Duração ↕
                   </th>
                   <th
-                    onClick={() => handleSortTasks({ field: 'startDate' })}
+                    onClick={() => handleSortTasks({ field: "startDate" })}
                     className={styles.thSort}
                   >
                     Data ↕
@@ -128,11 +101,11 @@ export function History() {
               </thead>
 
               <tbody>
-                {sortTasksOptions.tasks.map(task => {
+                {sortedTasks.map((task) => {
                   const taskTypeDictionary = {
-                    workTime: 'Foco',
-                    shortBreakTime: 'Descanso curto',
-                    longBreakTime: 'Descanso longo',
+                    workTime: "Foco",
+                    shortBreakTime: "Descanso curto",
+                    longBreakTime: "Descanso longo",
                   };
 
                   return (
@@ -151,7 +124,7 @@ export function History() {
         )}
 
         {!hasTasks && (
-          <p style={{ textAlign: 'center', fontWeight: 'bold' }}>
+          <p style={{ textAlign: "center", fontWeight: "bold" }}>
             Ainda não existem tarefas criadas.
           </p>
         )}
